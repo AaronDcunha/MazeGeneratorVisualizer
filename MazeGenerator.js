@@ -315,7 +315,6 @@ function solveMaze(){
     let pCell = null;
     let currentCell = endingPoint;
     while(currentCell !== null){
-        let coords = toCanvasCoords(currentCell);
         if(pCell !== null){
             let coordsA = toCanvasCoords(currentCell);
             let coordsB = toCanvasCoords(pCell);

@@ -29,7 +29,7 @@ h1{
     gap: 16px;
     font-size: 1em;
     margin-bottom: 4px;
-    margin-top: 0px;
+    margin-top: 0;
 }
 
 .social-links a {
