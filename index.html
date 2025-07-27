@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Maze Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <section>
+        <h1>Maze Generation Visualizer</h1>
+        <div class="social-links">
+            <a href="https://www.linkedin.com/in/aaron-d-cunha-3893b1226/" target="_blank" aria-label="LinkedIn">
+                <i class="fab fa-linkedin"></i>
+            </a>
+            <a href="" target="_blank" aria-label="GitHub">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+    </section>
+    <section id="section-main">
+        <canvas id="myCanvas" ></canvas>
+        <div id="explanation">
+            <div class="control flex-column">
+                <select id="algorithm">
+                    <option value="0">Depth-First Search</option>
+                    <option value="1">Kruskal's</option>
+                    <option value="2">Prim's</option>
+                    <option value="3">Hunt and Kill</option>
+                    <option value="4">Recursive Division</option>
+                    <option value="5">Eller's</option>
+                </select>
+            </div>
+            <ul id="algorithmInstruction">
+
+            </ul>
+            <script>
+                const dfsAlg = `
+                <li>Choose a random cell and call DFS</li>
+                <li>Mark the cell visited</li>
+                <li>While there are unvisited neighbors</li>
+                <ul>
+                    <li>Choose a randomized unvisited neighbor</li>
+                    <li>Break the wall between the 2 cells</li>
+                    <li>Call DFS with the neighbor as the parameter</li>
+                </ul>
+                `
+                const kruskalAlg = `
+                <li>Randomize list of edges</li>
+                <li>Iterate through each edge</li>
+                <li>If the cells in the edge belong to distinct sets</li>
+                <ul>
+                    <li>Merge the sets</li>
+                    <li>Break the wall between the 2 cells</li>
+                </ul>
+                `
+                const primsAlg = `
+                Note this uses a Randomized Prim's approach as opposed to using a Priority Queue
+                <li>Choose a random cell and mark it visited</li>
+                <li>Add all the edges to the cell to a list and call Prims</li>
+                <li>While the list is not empty</li>
+                <ul>
+                    <li>Pick a random edge</li>
+                    <li>Remove the edge from the list</li>
+                    <li>Break the wall between the 2 cells in that edge</li>
+                    <li>For each cell incident to one of the cells in the edge</li>
+                    <ul>
+                        <li>if the cell isn't visited</li>
+                        <ul>
+                            <li>Add the edge to the list</li>
+                        </ul>
+                    </ul>
+                </ul>
+                `
+                const huntKillAlg = `
+                <li>Call hunt and kill with a random cell</li>
+                <li>Set the cell to visited</li>
+                <li>Visit randomized unvisited neighbor until the current cell doesn't have any unvisited neighbors</li>
+                <li>Hunt for the next unvisited cell that is next to a visited cell</li>
+                <li>Call Hunt and kill with that cell if found</li>
+                `
+                const recursiveDivisionAlg = `
+                <li>Bisect the field either horizontally or vertically</li>
+                <li>Add a passage in the wall</li>
+                <li>Recursively repeat with resultant areas</li>
+                `
+                const ellersAlg = `
+                <li>Iterate from the first to the second to last row</li>
+                <ul>
+                    <li>Randomly join adjacent cells if they belong to distinct sets</li>
+                    <li>For each set</li>
+                    <ul>
+                        <li>Add one downward connection and add that cell to the set</li>
+                    </ul>
+                </ul>
+                <li>For the last row</li>
+                <ul>
+                    <li>Join adjacent cells that have distinct sets</li>
+                </ul>
+                `
+
+                const algInstruction = document.getElementById('algorithmInstruction');
+                algInstruction.innerHTML = dfsAlg;
+
+                const elementGenAlg = document.getElementById('algorithm');
+
+                elementGenAlg.addEventListener('change', (event) => {
+                    let genAlg = elementGenAlg.value
+                    switch (genAlg) {
+                        case "0":
+                            algInstruction.innerHTML = dfsAlg;
+                            break;
+                        case "1":
+                            algInstruction.innerHTML = kruskalAlg;
+                            break;
+                        case "2":
+                            algInstruction.innerHTML = primsAlg;
+                            break;
+                        case "3":
+                            algInstruction.innerHTML = huntKillAlg;
+                            break;
+                        case "4":
+                            algInstruction.innerHTML = recursiveDivisionAlg;
+                            break;
+                        case "5":
+                            algInstruction.innerHTML = ellersAlg;
+                            break;
+                    }
+                });
+
+            </script>
+        </div>
+        <div id ="panel">
+
+            <div>
+                <div class="control">
+                    <label for="borderColor">Wall Color</label>
+                    <input type="color" id="borderColor" value="#000000" />
+                </div>
+                <div class="control">
+                    <label for="borderColor">Maze Color 1</label>
+                    <input type="color" id="mazeColor" value="#ffffff" />
+                </div>
+                <div class="control">
+                    <label for="borderColor">Maze Color 2</label>
+                    <input type="color" id="mazeColor2" value="#cfcfcf" />
+                </div>
+                <div class="control">
+                    <label for="borderColor">Highlight Color</label>
+                    <input type="color" id="highlightColor" value="#55ff00" />
+                </div>
+                <div class="control">
+                    <label for="borderColor">Solution Color</label>
+                    <input type="color" id="solutionColor" value="#55ff00" />
+                </div>
+            </div>
+            <div>
+                <div class="control flex-column">
+                    <label for="speed">Step Speed: <span id="speedValue">250</span>ms</label>
+                    <input type="range" id="speed" min="50" max="500" value="250" step="10" />
+                    <script>
+                        document.getElementById("speed").addEventListener("input", ()=>{
+                            document.getElementById("speedValue").innerHTML = document.getElementById("speed").value;
+                        })
+                    </script>
+                </div>
+
+                <div class="control">
+                    <label for="instant">Instant Generation?</label>
+                    <input type="checkbox" id="instant" />
+                </div>
+            </div>
+            <button class="button" id="mazeReset">Reset Values</button>
+            <button class="button" id="mazeGenerate">Generate New Maze</button>
+            <button class="button" id="mazeSolve">Solution</button>
+        </div>
+    </section>
+    <br/>
+    Made by Aaron D'Cunha
+
+
+    <script type="module" src="MazeGenerator.js"></script>
+
+</body>
+</html>
