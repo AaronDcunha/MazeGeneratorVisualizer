@@ -39,6 +39,7 @@ let GraphGenerated = true;
 let GraphSolution;
 let stopGenerating = false;
 let solveBlocked = true;
+let solutionGenerated = false;
 
 function setupCanvas(){
     GraphGenerated = false;
@@ -279,10 +280,11 @@ function genMaze_Eller(){
 
 //Solve Maze using BFS
 function solveMaze(){
-    if(GraphGenerated === false || solveBlocked === true){
+    if(GraphGenerated === false || solveBlocked === true || solutionGenerated === true){
         return;
     }
 
+    solutionGenerated = true;
     let startingPoint = GraphSolution.getVertex(0);
     let endingPoint = GraphSolution.getVertex((rows*columns)-1);
     let solved = false;
@@ -352,18 +354,6 @@ function mazeReady(){
     console.log("Maze Generated!");
 }
 
-setupCanvas();
-generateMazeBorderOnly();
-GraphGenerated = true;
-
-//ALGORITHMS
-//genMaze_DFS();
-//genMaze_KRUSKAL();
-//genMaze_HuntKill();
-//genMaze_Prims();
-//genMaze_RecDiv();
-//genMaze_Eller();
-
 async function waitUntilTrue() {
     while (GraphGenerated === false) {
         await new Promise(resolve => setTimeout(resolve, 50));
@@ -389,6 +379,7 @@ async function generateMaze(){
     instantGen = elementInstant.checked;
 
     stopGenerating = true;
+    solutionGenerated = false;
 
     await waitUntilTrue();
 
@@ -436,9 +427,20 @@ function setDefaultHTMLParameters(){
     document.getElementById("speedValue").innerHTML = genSpeedDefault.toString();
 }
 
+function downloadMaze(){
+    const mazeImage = document.createElement("a");
+    mazeImage.download = "maze-image.png";
+    mazeImage.href = canvas.toDataURL("image/jpeg");
+    mazeImage.click();
+}
+
+setupCanvas();
+generateMazeBorderOnly();
+GraphGenerated = true;
 document.getElementById("mazeGenerate").addEventListener("click", generateMaze);
 document.getElementById("mazeSolve").addEventListener("click", solveMaze);
 document.getElementById("mazeReset").addEventListener("click", ()=>{
     setDefaultHTMLParameters();
 });
+document.getElementById("mazeDownload").addEventListener("click", downloadMaze);
 setDefaultHTMLParameters();
